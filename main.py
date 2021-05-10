@@ -10,15 +10,6 @@ import csv
 
 print('Welcome to personal reminder')
 
-with open('task_list.csv', 'w', newline='') as task_file:
-    csv_writer = csv.writer(task_file)
-    csv_writer.writerow(['task_id', 'user_id', 'title', 'description', 'due_date', 'set_date',
-                         'priority', 'projects', 'link', 'location', 'status', 'delete_'])
-
-with open('share_task.csv', 'w', newline='') as task_file:
-    csv_writer = csv.writer(task_file)
-    csv_writer.writerow(['shared_task_id', 'sender_name', 'receiver_name', 'title', 'description', 'due_date',
-                         'priority', 'projects', 'link', 'location', 'accept/deny', 'check'])
 
 while True:
     print('which one do you want to do?\n'
