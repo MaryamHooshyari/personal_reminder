@@ -5,6 +5,7 @@
 from datetime import datetime, date
 import csv
 import pandas as pd
+from termcolor import colored
 
 
 class Task:
@@ -55,6 +56,7 @@ class Task:
         link = input('please enter related links to the task: ')
         location = input('please enter related locations to the task: ')
         set_date = datetime.now()
+        priority = 4
         if importance == 'yes' and urgency == 'yes':
             priority = 1
         elif importance == 'yes' and urgency == 'no':
@@ -63,15 +65,14 @@ class Task:
             priority = 3
         elif importance == 'no' and urgency == 'no':
             priority = 4
-        task_id += 1
-        object_task = Task(task_id, user_id, title, description, due_date, set_date, priority, project, link, location)
+        object_task = Task(task_id, int(user_id), title, description, due_date, set_date, priority, project, link, location)
         row_task = [[object_task.task_id, object_task.user_id, object_task.title, object_task.description,
-                     object_task.due_date, object_task.set_date, object_task.priority, object_task.projects,
-                     object_task.link, object_task.location, object_task.status, object_task.delete_]]
+                    object_task.due_date, object_task.set_date, object_task.priority, object_task.projects,
+                    object_task.link, object_task.location, object_task.status, object_task.delete_]]
         with open('task_list.csv', 'a', newline='') as csv_task:
             csv_writer = csv.writer(csv_task)
             csv_writer.writerows(row_task)
-        return task_id
+        return object_task
 
     def edit_title(self, title):
         """
@@ -80,9 +81,7 @@ class Task:
         :return: changed task
         """
         self.title = title
-        task = Task(self.task_id, self.user_id, self.title, self.description, self.due_date, self.set_date,
-                    self.priority, self.projects, self.link, self.location, self.status, self.delete_)
-        return task
+        return self
 
     def edit_description(self, description):
         """
@@ -91,9 +90,7 @@ class Task:
         :return: changed task
         """
         self.description = description
-        task = Task(self.task_id, self.user_id, self.title, self.description, self.due_date, self.set_date,
-                    self.priority, self.projects, self.link, self.location, self.status, self.delete_)
-        return task
+        return self
 
     def edit_priority(self, priority):
         """
@@ -102,9 +99,7 @@ class Task:
         :return: changed task
         """
         self.priority = priority
-        task = Task(self.task_id, self.user_id, self.title, self.description, self.due_date, self.set_date,
-                    self.priority, self.projects, self.link, self.location, self.status, self.delete_)
-        return task
+        return self
 
     def edit_projects(self, projects):
         """
@@ -113,9 +108,7 @@ class Task:
         :return: changed task
         """
         self.projects = projects
-        task = Task(self.task_id, self.user_id, self.title, self.description, self.due_date, self.set_date,
-                    self.priority, self.projects, self.link, self.location, self.status, self.delete_)
-        return task
+        return self
 
     def edit_link(self, link):
         """
@@ -124,9 +117,7 @@ class Task:
         :return: changed task
         """
         self.link = link
-        task = Task(self.task_id, self.user_id, self.title, self.description, self.due_date, self.set_date,
-                    self.priority, self.projects, self.link, self.location, self.status, self.delete_)
-        return task
+        return self
 
     def edit_location(self, location):
         """
@@ -135,9 +126,7 @@ class Task:
         :return: changed task
         """
         self.location = location
-        task = Task(self.task_id, self.user_id, self.title, self.description, self.due_date, self.set_date,
-                    self.priority, self.projects, self.link, self.location, self.status, self.delete_)
-        return task
+        return self
 
     def postpone(self, due_date):
         """
@@ -146,9 +135,7 @@ class Task:
         :return: changed task
         """
         self.due_date = due_date
-        task = Task(self.task_id, self.user_id, self.title, self.description, self.due_date, self.set_date,
-                    self.priority, self.projects, self.link, self.location, self.status, self.delete_)
-        return task
+        return self
 
     def delete(self):
         """
@@ -156,9 +143,7 @@ class Task:
         :return: changed task
         """
         self.delete_ = 0
-        task = Task(self.task_id, self.user_id, self.title, self.description, self.due_date, self.set_date,
-                    self.priority, self.projects, self.link, self.location, self.status, self.delete_)
-        return task
+        return self
 
     def done(self):
         """
@@ -166,9 +151,7 @@ class Task:
         :return: changed task
         """
         self.status = 1
-        task = Task(self.task_id, self.user_id, self.title, self.description, self.due_date, self.set_date,
-                    self.priority, self.projects, self.link, self.location, self.status, self.delete_)
-        return task
+        return self
 
     @staticmethod
     def display_task(user_id, status, period):
@@ -178,36 +161,65 @@ class Task:
             lines = []
             for line in reader:
                 # line[4] is task's due date
-                delta_day = (line[4].date() - now.date()).days
-                if line[1] == user_id and line[10] == status and delta_day < period:
+                if line[1] == user_id and line[10] == status:
                     """
                     line[1]: task owner's id
                     line[10]: task status attribute (0 means undone and 1 means undone)
-                    delta_day: shows how many days are between now and task's due date
-                    this will collect all tasks on user conditions (status: done or undone & 
+                    this will collect all tasks on user conditions (status: done or undone)
                     """
-                    lines.append(line)
+                    due_date = datetime(int(line[4][0:4]), int(line[4][5:7]), int(line[4][8:10]))
+                    delta_day = (due_date.date() - now.date()).days
+                    if delta_day < period:
+                        """
+                        delta_day: shows how many days are between now and task's due date
+                        this will collect all tasks on user conditions (time difference: a day, a week, a month)
+                        """
+                        lines.append(line)
         return lines
 
     @staticmethod
-    def in_calendar(user_id):
-        """
-        shows all undone tasks for a particular user in a calender
-        :param user_id: task owner ID
-        :return:
-        """
-        pass
+    def in_calendar(year, month_name, month_day, start_day, due_date_list, calendar_task):
+        print(f'{month_name} {year}')
+        print("Sun Mon Tue Wed Thu Fri Sat")
+        i = 1 - start_day
+        while i <= month_day:
+            if 0 < i < 10:
+                if i in due_date_list:
+                    print("", colored(i, 'red'), end="  ")
+                else:
+                    print("", i, end="  ")
+            elif i <= 0:
+                print("  ", end="  ")
+            else:
+                if i in due_date_list:
+                    print(colored(i, 'red'), end="  ")
+                else:
+                    print(i, end="  ")
+            if (i + start_day) % 7 == 0:
+                print(" ")
+            i += 1
+        print()
+        for j in due_date_list:
+            for task in calendar_task:
+                if j == int(task[3][8:10]):
+                    print(f'{j} --> {task[0]}:{task[1]}')
 
-    def share(self, sender, receiver):
+    def share(self, sender, receiver, shared_task_id):
         """
 
+        :param shared_task_id: an id use for share_task.csv primary key
         :param sender: class user, the user who wants to share the task
         :param receiver: username for the user who is going to receive the task
-        :return:
+        :return: a row with shared task informations use to save in share_task.csv
         """
-
         share_task = [shared_task_id, sender.username, receiver, self.title, self.description, self.due_date, self.priority,
                       self.projects, self.link, self.location, 0, 0]
+        """
+        two last parameters which are both 0 valued are for checking
+        first one, column name is accept/deny if value is 0 request is denied and  if it's 1 request is accepted
+        by default it's 0 means denied until receiver check and accept it
+        second one, column name is check if value is 0 request is not checked yet and  if it's 1 request is checked
+        """
         return share_task
 
 

@@ -53,26 +53,19 @@ class User:
         else:
             print('username already exist!')
 
-    @staticmethod
-    def log_in():
+    def log_in(self):
         """
         open the task csv file for the user
         :return: user id for the logged in user
         """
-        column_names = ["user_id", "username", "password", "E-mail", "status"]
-        df = pd.read_csv("account.csv", names=column_names)
-        user_list = list(df.username)
-        username = input('enter username: ')
-        if username in user_list:
-            i = user_list.index(username)
-            counter = 0
-            while counter < 3:
-                password = input('enter password: ')
-                hashed_pwd = hashlib.sha256(password.encode('utf8')).hexdigest()
-                if hashed_pwd == df.password[i] and df.status[i] == 1:
-                    print(f'{username} logged in successfully')
-                    return User(df.user_id[i], df.username[i], df.password[i], df.email[i], df.status[i])
-                counter += 1
+        res = False
+        for i in range(3):
+            password = input('enter password: ')
+            hashed_pwd = hashlib.sha256(password.encode('utf8')).hexdigest()
+            if self.password == hashed_pwd and self.status == '1':
+                res = True
+                break
+        return res
 
     # @staticmethod
     # def log_out(id):
