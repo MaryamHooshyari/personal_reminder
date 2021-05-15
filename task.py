@@ -2,10 +2,8 @@
 # Maryam Hooshyari
 # personal reminder / task class
 
-from datetime import datetime, date
+from datetime import datetime
 import csv
-import pandas as pd
-from termcolor import colored
 
 
 class Task:
@@ -39,40 +37,13 @@ class Task:
         self.delete_ = delete_
 
     @staticmethod
-    def add_task(task_id, user_id):
+    def add_task(user_id):
         """
         make new task
-        :param task_id: id of previous task plus it with one and use as this new task id
         :param user_id: task owner's id
         :return: new task
         """
-        title = input('please enter title of your task: ')
-        description = input('please enter description of your task: ')
-        day = list(map(int, input('when is the due date of this task? (yyyy,mm,dd,hh,mm,ss) ').split(',')))
-        due_date = datetime(day[0], day[1], day[2], day[3], day[4], day[5])
-        importance = input('is this task important? (yes / no)')
-        urgency = input('is this task urgent? (yes / no)')
-        project = input("what is the task's project? (default: inbox)")
-        link = input('please enter related links to the task: ')
-        location = input('please enter related locations to the task: ')
-        set_date = datetime.now()
-        priority = 4
-        if importance == 'yes' and urgency == 'yes':
-            priority = 1
-        elif importance == 'yes' and urgency == 'no':
-            priority = 2
-        elif importance == 'no' and urgency == 'yes':
-            priority = 3
-        elif importance == 'no' and urgency == 'no':
-            priority = 4
-        object_task = Task(task_id, int(user_id), title, description, due_date, set_date, priority, project, link, location)
-        row_task = [[object_task.task_id, object_task.user_id, object_task.title, object_task.description,
-                    object_task.due_date, object_task.set_date, object_task.priority, object_task.projects,
-                    object_task.link, object_task.location, object_task.status, object_task.delete_]]
-        with open('task_list.csv', 'a', newline='') as csv_task:
-            csv_writer = csv.writer(csv_task)
-            csv_writer.writerows(row_task)
-        return object_task
+        pass
 
     def edit_title(self, title):
         """
@@ -177,33 +148,6 @@ class Task:
                         lines.append(line)
         return lines
 
-    @staticmethod
-    def in_calendar(year, month_name, month_day, start_day, due_date_list, calendar_task):
-        print(f'{month_name} {year}')
-        print("Sun Mon Tue Wed Thu Fri Sat")
-        i = 1 - start_day
-        while i <= month_day:
-            if 0 < i < 10:
-                if i in due_date_list:
-                    print("", colored(i, 'red'), end="  ")
-                else:
-                    print("", i, end="  ")
-            elif i <= 0:
-                print("  ", end="  ")
-            else:
-                if i in due_date_list:
-                    print(colored(i, 'red'), end="  ")
-                else:
-                    print(i, end="  ")
-            if (i + start_day) % 7 == 0:
-                print(" ")
-            i += 1
-        print()
-        for j in due_date_list:
-            for task in calendar_task:
-                if j == int(task[3][8:10]):
-                    print(f'{j} --> {task[0]}:{task[1]}')
-
     def share(self, sender, receiver, shared_task_id):
         """
 
@@ -212,8 +156,8 @@ class Task:
         :param receiver: username for the user who is going to receive the task
         :return: a row with shared task informations use to save in share_task.csv
         """
-        share_task = [shared_task_id, sender.username, receiver, self.title, self.description, self.due_date, self.priority,
-                      self.projects, self.link, self.location, 0, 0]
+        share_task = [shared_task_id, sender.username, receiver, self.title, self.description, self.due_date,
+                      self.priority, self.projects, self.link, self.location, 0, 0]
         """
         two last parameters which are both 0 valued are for checking
         first one, column name is accept/deny if value is 0 request is denied and  if it's 1 request is accepted

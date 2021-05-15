@@ -27,6 +27,7 @@ class User:
     @staticmethod
     def create_account(user_id):
         """
+        (int) --> int
         create aan account for new user and a csv file for this user's tasks
         :return: user_id that shows how many user account made!
         """
@@ -55,6 +56,7 @@ class User:
 
     def log_in(self):
         """
+        (User object) --> bool
         open the task csv file for the user
         :return: user id for the logged in user
         """
@@ -82,23 +84,23 @@ class User:
 
     def delete_account(self):
         """
+        (User  object) --> User object
         change user's status from enable(1) to disable(0)
         :return: changed user's attributes in a list
         """
         self.status = 0
-        user = [self.user_id, self.username, self.password, self.email, self.status]
-        return user
+        return self
 
     def change_password(self, password):
         """
+        (User  object) --> User object
         change user's password to a new one
         :param password: new password which user want to change
         :return: changed user's attributes in a list
         """
         hashed_password = hashlib.sha256(password.encode('utf8')).hexdigest()
         self.password = hashed_password
-        user = [self.user_id, self.username, self.password, self.email, self.status]
-        return user
+        return self
 
 
 if __name__ == '__main__':
