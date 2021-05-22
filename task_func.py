@@ -1,6 +1,6 @@
-# 2021.04.24
+# May 2021
 # Maryam Hooshyari
-# personal reminder / file_module
+# personal reminder / task_id, add_task_to_file, save_task, create_task, display_task, is_leap, in_calendar
 
 
 import csv
@@ -9,7 +9,17 @@ from termcolor import colored
 from task import Task
 
 
-def save_task(task):
+def task_id():
+    """
+    counts how many lines exists in task_list.csv file which means the number of tasks plus one(title row)
+    :return: id for new task
+    """
+    with open('task_list.csv') as tl:
+        id = sum(1 for line in tl)
+    return id
+
+
+def add_task_to_file(task):
     """
     (task object) --> None
     this will just save the task file as a row in task_list.csv
@@ -23,15 +33,28 @@ def save_task(task):
         csv_writer.writerows(row_task)
 
 
-def add_task(user_id):
+def save_task(task):
+    with open("task_list.csv", 'r') as ts:
+        reader = csv.reader(ts, delimiter=',')
+        save_lines = []
+        for line in reader:
+            if line[0] == task.task_id:
+                line = [task.task_id, task.user_id, task.title, task.description, task.due_date, task.set_date,
+                        task.priority, task.projects, task.link, task.location, task.status, task.delete_]
+            save_lines.append(line)
+    with open("task_list.csv", 'w', newline='') as ts:
+        writer = csv.writer(ts, delimiter=',')
+        writer.writerows(save_lines)
+
+
+def create_task(user_id):
     """
     (int) + inputs --> task object
     get a id which is for the user  who is going to make a task
     :param user_id: id for task owner
-    :return: a task object
+    :return: task object
     """
-    with open('task_list.csv') as tl:
-        task_id = sum(1 for line in tl)
+    id = task_id()
     title = input('please enter title of your task: ')
     description = input('please enter description of your task: ')
     day = list(map(int, input('when is the due date of this task? (yyyy,mm,dd,hh,mm) ').split(',')))
@@ -51,14 +74,39 @@ def add_task(user_id):
         priority = 3
     elif importance == 'no' and urgency == 'no':
         priority = 4
-    new_task = Task(task_id, int(user_id), title, description, due_date, set_date, priority, project, link, location)
+    new_task = Task(id, int(user_id), title, description, due_date, set_date, priority, project, link, location)
     return new_task
+
+
+def display_task(user_id, status, period):
+    now = datetime.now()
+    with open("task_list.csv", 'r') as f:
+        reader = csv.reader(f, delimiter=',')
+        lines = []
+        for line in reader:
+            # line[4] is task's due date
+            if line[1] == user_id and line[10] == status:
+                """
+                line[1]: task owner's id
+                line[10]: task status attribute (0 means undone and 1 means undone)
+                this will collect all tasks on user conditions (status: done or undone)
+                """
+                due_date = datetime(int(line[4][0:4]), int(line[4][5:7]), int(line[4][8:10]))
+                delta_day = (due_date.date() - now.date()).days
+                if delta_day < period:
+                    """
+                    delta_day: shows how many days are between now and task's due date
+                    this will collect all tasks on user conditions (time difference: a day, a week, a month)
+                    """
+                    lines.append(line)
+    return lines
 
 
 def is_leap(yr):
     """
     (int) -> bool
     Checks if year is a leap year
+    called by in_calendar function
     """
     if yr % 4 == 0:
         if yr % 100 == 0:
@@ -79,6 +127,7 @@ def in_calendar(user_id):
     then asks user about which month wants to see
     :param user_id: task owner's id
     :return: None
+    called by task_menu function
     """
     calendar_task = []
     with open("task_list.csv", 'r') as f:

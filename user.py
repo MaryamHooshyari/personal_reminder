@@ -1,10 +1,9 @@
-# 2021.04.24
+# May 2021
 # Maryam Hooshyari
 # personal reminder / user class
 
-import pandas as pd
+
 import hashlib
-import csv
 
 
 class User:
@@ -24,36 +23,6 @@ class User:
         self.email = email
         self.status = status
 
-    @staticmethod
-    def create_account(user_id):
-        """
-        (int) --> int
-        create aan account for new user and a csv file for this user's tasks
-        :return: user_id that shows how many user account made!
-        """
-        column_names = ["user_id", "username", "password", "E-mail", "status"]
-        df = pd.read_csv("account.csv", names=column_names)
-        user_list = list(df.username)
-        username = input('enter username: ')
-        if username not in user_list:
-            password = input('enter password: ')
-            password_ = input('confirm password: ')
-            if password == password_:
-                hashed_pwd = hashlib.sha256(password.encode('utf8')).hexdigest()
-                email = input('enter your E-mail: ')
-                object_user = User(user_id, username, hashed_pwd, email)
-                row_account = [[object_user.user_id, object_user.username, object_user.password, object_user.email,
-                                object_user.status]]
-                with open('account.csv', 'a', newline='') as csv_account:
-                    csv_writer = csv.writer(csv_account)
-                    csv_writer.writerows(row_account)
-                print('new account created')
-                return user_id
-            else:
-                print('confirm password does not match!')
-        else:
-            print('username already exist!')
-
     def log_in(self):
         """
         (User object) --> bool
@@ -68,19 +37,6 @@ class User:
                 res = True
                 break
         return res
-
-    # @staticmethod
-    # def log_out(id):
-    #     """
-    #     gets id for logged in user finds its username and send a message about logging out successfully
-    #     :return: does not return any thing
-    #     """
-    #     column_names = ["user_id", "username", "password", "E-mail", "status"]
-    #     df = pd.read_csv("account.csv", names=column_names)
-    #     id_list = df.user_id
-    #     i = id_list.index(id)
-    #     username = df.username[i]
-    #     print(f'{username} logged out successfully')
 
     def delete_account(self):
         """
@@ -101,7 +57,3 @@ class User:
         hashed_password = hashlib.sha256(password.encode('utf8')).hexdigest()
         self.password = hashed_password
         return self
-
-
-if __name__ == '__main__':
-    pass

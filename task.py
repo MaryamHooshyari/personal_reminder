@@ -1,9 +1,6 @@
-# 2021.04.24
+# May 2021
 # Maryam Hooshyari
 # personal reminder / task class
-
-from datetime import datetime
-import csv
 
 
 class Task:
@@ -35,15 +32,6 @@ class Task:
         self.set_date = set_date
         self.status = status
         self.delete_ = delete_
-
-    @staticmethod
-    def add_task(user_id):
-        """
-        make new task
-        :param user_id: task owner's id
-        :return: new task
-        """
-        pass
 
     def edit_title(self, title):
         """
@@ -124,30 +112,6 @@ class Task:
         self.status = 1
         return self
 
-    @staticmethod
-    def display_task(user_id, status, period):
-        now = datetime.now()
-        with open("task_list.csv", 'r') as f:
-            reader = csv.reader(f, delimiter=',')
-            lines = []
-            for line in reader:
-                # line[4] is task's due date
-                if line[1] == user_id and line[10] == status:
-                    """
-                    line[1]: task owner's id
-                    line[10]: task status attribute (0 means undone and 1 means undone)
-                    this will collect all tasks on user conditions (status: done or undone)
-                    """
-                    due_date = datetime(int(line[4][0:4]), int(line[4][5:7]), int(line[4][8:10]))
-                    delta_day = (due_date.date() - now.date()).days
-                    if delta_day < period:
-                        """
-                        delta_day: shows how many days are between now and task's due date
-                        this will collect all tasks on user conditions (time difference: a day, a week, a month)
-                        """
-                        lines.append(line)
-        return lines
-
     def share(self, sender, receiver, shared_task_id):
         """
 
@@ -165,7 +129,3 @@ class Task:
         second one, column name is check if value is 0 request is not checked yet and  if it's 1 request is checked
         """
         return share_task
-
-
-if __name__ == '__main__':
-    pass
