@@ -5,7 +5,7 @@
 import logging
 import csv
 import os.path
-from user import User
+from user_class import User
 from task_menu import task_menu
 from user_func import user_id, create_account, add_user_to_file
 

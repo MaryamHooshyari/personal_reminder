@@ -6,14 +6,19 @@ import logging
 import csv
 import hashlib
 from datetime import datetime
-from user import User
-from task import Task
+from user_class import User
+from task_class import Task
 from main import main_menu
 from user_func import save_user
 from task_func import create_task, add_task_to_file, save_task, display_task, in_calendar
 
 
 def show_task_menu(user):
+    """
+    (user object) --> nothing
+    just a menu for show tasks part
+    called by task_menu function
+    """
     print('1-show undone tasks\n'
           '2-show done tasks\n'
           '3-go to TASK menu')
@@ -58,6 +63,11 @@ def show_task_menu(user):
 
 
 def choose_from_task_list(user):
+    """
+    (user object) --> (task object)
+    just a menu to show tasks in a list so user can choose one
+    called by task_menu function
+    """
     print('which task you want to edit or share?')
     with open("task_list.csv", 'r') as f:
         reader = csv.reader(f, delimiter=',')
@@ -87,6 +97,11 @@ def choose_from_task_list(user):
 
 
 def edit_task_menu(task, user):
+    """
+    (user object) and (task object) --> nothing
+    a menu for edit and share tasks part
+    called by task_menu function
+    """
     print('what change you want to apply?\n'
           '1-postpone\n'
           '2-report if the task is done\n'
@@ -184,6 +199,9 @@ def edit_task_menu(task, user):
             save_task(task)
             logging.info('exit edit task menu')
             task_menu(user)
+        else:
+            print('invalid input: number does not exist in menu')
+            logging.warning('invalid input in edit task menu: unavailable number in menu')
 
 
 def task_menu(user):
@@ -223,7 +241,6 @@ def task_menu(user):
             task_menu(user)
         elif task_input == 4:
             show_task_menu(user)
-            task_menu(user)
         elif task_input == 5:
             current_password = input('enter your current password: ')
             hashed_pwd = hashlib.sha256(current_password.encode('utf8')).hexdigest()

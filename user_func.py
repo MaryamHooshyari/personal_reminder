@@ -4,7 +4,7 @@
 
 import csv
 import hashlib
-from user import User
+from user_class import User
 import pandas as pd
 
 
@@ -43,6 +43,11 @@ def create_account(id):
 
 
 def add_user_to_file(user):
+    """
+    appends a user row to account.csv file
+    :param user: user object which is going to save
+    :return: nothing
+    """
     row_account = [[user.user_id, user.username, user.password, user.email, user.status]]
     with open('account.csv', 'a', newline='') as csv_account:
         csv_writer = csv.writer(csv_account)
@@ -50,6 +55,11 @@ def add_user_to_file(user):
 
 
 def save_user(user):
+    """
+    rewrites a user row to account.csv file
+    :param user: user object which is going to save
+    :return: nothing
+    """
     with open("account.csv", 'r') as f:
         reader = csv.reader(f, delimiter=',')
         save_lines = []

@@ -6,7 +6,7 @@
 import csv
 from datetime import datetime, date
 from termcolor import colored
-from task import Task
+from task_class import Task
 
 
 def task_id():
@@ -34,6 +34,11 @@ def add_task_to_file(task):
 
 
 def save_task(task):
+    """
+    rewrites a task row to task_list.csv file
+    :param task: task object which is going to save
+    :return: nothing
+    """
     with open("task_list.csv", 'r') as ts:
         reader = csv.reader(ts, delimiter=',')
         save_lines = []
@@ -79,6 +84,13 @@ def create_task(user_id):
 
 
 def display_task(user_id, status, period):
+    """
+    shows a list of selected tasks
+    :param user_id: id for tasks' owner
+    :param status: status for tasks want to see(done or undone)
+    :param period: period of time choosed for task show(a day, a week, a month)
+    :return: list of selected tasks with particular conditions
+    """
     now = datetime.now()
     with open("task_list.csv", 'r') as f:
         reader = csv.reader(f, delimiter=',')
