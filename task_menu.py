@@ -8,7 +8,6 @@ import hashlib
 from datetime import datetime
 from user_class import User
 from task_class import Task
-from main import main_menu
 from user_func import save_user
 from task_func import create_task, add_task_to_file, save_task, display_task, in_calendar
 
@@ -68,7 +67,8 @@ def choose_from_task_list(user):
     just a menu to show tasks in a list so user can choose one
     called by task_menu function
     """
-    print('which task you want to edit or share?')
+    print('which task you want to edit or share?\n'
+          '** enter 0 if you want to go to TASK menu')
     with open("task_list.csv", 'r') as f:
         reader = csv.reader(f, delimiter=',')
         lines = []
@@ -91,9 +91,12 @@ def choose_from_task_list(user):
         logging.error('invalid input in choose task from list menu: not a number')
         choose_from_task_list(user)
     else:
-        task = Task(lines[n][0], lines[n][1], lines[n][2], lines[n][3], lines[n][4], lines[n][5], lines[n][6],
-                    lines[n][7], lines[n][8], lines[n][9], lines[n][10], lines[n][11])
-        return task
+        if n == -1:
+            task_menu(user)
+        else:
+            task = Task(lines[n][0], lines[n][1], lines[n][2], lines[n][3], lines[n][4], lines[n][5], lines[n][6],
+                        lines[n][7], lines[n][8], lines[n][9], lines[n][10], lines[n][11])
+            return task
 
 
 def edit_task_menu(task, user):
@@ -122,24 +125,28 @@ def edit_task_menu(task, user):
         if edit_input == 1:
             new_due_date = input('enter new due date: ')
             task.postpone(new_due_date)
+            save_task(task)
             logging.info('task postponed')
             print(f'{task.title} is postponed to {task.due_date}')
-            edit_task_menu(task, user)
+            choose_from_task_list(user)
         elif edit_input == 2:
             task.done()
+            save_task(task)
             logging.info('task is done')
             print(f'{task.title} is done!')
-            edit_task_menu(task, user)
+            choose_from_task_list(user)
         elif edit_input == 3:
             new_title = input('enter new title: ')
             task.edit_title(new_title)
+            save_task(task)
             logging.info("task's title edited")
-            edit_task_menu(task, user)
+            choose_from_task_list(user)
         elif edit_input == 4:
             new_description = input('enter new description: ')
             task.edit_description(new_description)
+            save_task(task)
             logging.info("task's description edited")
-            edit_task_menu(task, user)
+            choose_from_task_list(user)
         elif edit_input == 5:
             try:
                 new_priority = int(input('enter new priority:\n'
@@ -151,24 +158,28 @@ def edit_task_menu(task, user):
             except ValueError:
                 print('Only integers are allowed!')
                 logging.error('invalid input in priority input: not a number')
+                edit_task_menu(task, user)
             else:
                 if new_priority in [1, 2, 3, 4]:
                     task.edit_priority(new_priority)
+                    save_task(task)
+                    logging.info("task's priority edited")
                 else:
                     print('invalid input: you should give a number between 1 to 4')
                     logging.warning('invalid input in priority input: unavailable number in menu')
-                logging.info("task's priority edited")
-                edit_task_menu(task, user)
+                choose_from_task_list(user)
         elif edit_input == 6:
             new_link = input('enter new link: ')
             task.edit_link(task, new_link)
+            save_task(task)
             logging.info("task's link edited")
-            edit_task_menu(task, user)
+            choose_from_task_list(user)
         elif edit_input == 7:
             new_location = input('enter new location: ')
             task.edit_location(new_location)
+            save_task(task)
             logging.info("task's location edited")
-            edit_task_menu(task, user)
+            choose_from_task_list(user)
         elif edit_input == 8:
             print('who do you want to share your task with?')
             share_user_list = []
@@ -176,7 +187,7 @@ def edit_task_menu(task, user):
                 reader = csv.reader(ac, delimiter=',')
                 i = 1
                 for line in reader:
-                    if line[1] != user.username:
+                    if line[1] != user.username and line[1] != 'username':
                         print(f'{i}-{line[1]}')  # to make a list of usernames as menu to choose
                         share_user_list.append(line[1])
                         i += 1
@@ -187,16 +198,15 @@ def edit_task_menu(task, user):
             shared = Task.share(task, user.username, receiver, shared_task_id)
             with open("share_task.csv", 'a', newline='') as share:
                 writer = csv.writer(share, delimiter=',')
-                writer.writerows(shared)
+                writer.writerow(shared)
             logging.info('new share task added')
-            edit_task_menu(task, user)
+            choose_from_task_list(user)
         elif edit_input == 9:
             task = Task.delete(task)
             save_task(task)
             logging.info('task deleted')
             task_menu(user)
         elif edit_input == 10:
-            save_task(task)
             logging.info('exit edit task menu')
             task_menu(user)
         else:
@@ -241,6 +251,7 @@ def task_menu(user):
             task_menu(user)
         elif task_input == 4:
             show_task_menu(user)
+            task_menu(user)
         elif task_input == 5:
             current_password = input('enter your current password: ')
             hashed_pwd = hashlib.sha256(current_password.encode('utf8')).hexdigest()
@@ -255,12 +266,12 @@ def task_menu(user):
         elif task_input == 6:
             print(f'{user.username} logged out successfully.')
             logging.info('user logged out')
-            main_menu()
+            exit()
         elif task_input == 7:
             user = User.delete_account(user)
             print(f'{user.username} account deleted successfully.')
             logging.info('user deleted account')
-            main_menu()
+            exit()
         elif task_input == 8:
             if share_exist:
                 with open('share_task.csv', 'r') as st:

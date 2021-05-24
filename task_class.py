@@ -120,7 +120,7 @@ class Task:
         :param receiver: username for the user who is going to receive the task
         :return: a row with shared task informations use to save in share_task.csv
         """
-        share_task = [shared_task_id, sender.username, receiver, self.title, self.description, self.due_date,
+        share_task = [shared_task_id, sender, receiver, self.title, self.description, self.due_date,
                       self.priority, self.projects, self.link, self.location, 0, 0]
         """
         two last parameters which are both 0 valued are for checking
